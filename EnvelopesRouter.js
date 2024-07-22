@@ -4,6 +4,20 @@ const EnvelopesRouter = express.Router();
 const { envelopes, budgets } = require("./data");
 const { Envelope, Target } = require("./db");
 
+EnvelopesRouter.param("envelopeID", (req, res, next, id) => {
+  const envelopeID = Number(id);
+
+  if (!(envelopeID > 0 && envelopeID < envelopes.length + 1)) {
+    let invalidIDError = new Error("ID not found.");
+    invalidIDError.status = 404;
+    return next(invalidIDError);
+  }
+
+  req.envelopeID = envelopeID;
+  next();
+});
+
+// Retrive Envelopes
 EnvelopesRouter.get("/", (req, res, next) => {
   const envelopesJSON = JSON.stringify(
     envelopes.map((envelope, index) => {
@@ -25,6 +39,25 @@ EnvelopesRouter.get("/", (req, res, next) => {
   res.send(envelopesJSON);
 });
 
+// Retrive an Envelope
+EnvelopesRouter.get("/:envelopeID", (req, res, next) => {
+  const index = req.envelopeID - 1;
+  const envelopeJSON = JSON.stringify({
+    id: req.envelopeID,
+    title: envelopes[index].title,
+    targets: envelopes[index].targets.map((target, id) => {
+      return {
+        id: id + 1,
+        year: target.year,
+        month: target.month,
+        amount: target.amount,
+      };
+    }),
+  });
+  res.send(envelopeJSON);
+});
+
+// Create Envelope
 EnvelopesRouter.post("/", (req, res, next) => {
   // Body validation
 
@@ -42,15 +75,11 @@ EnvelopesRouter.post("/", (req, res, next) => {
   // Verify Uniqueness
 
   for (const envelope of envelopes) {
-
     if (newEnvelope.title === envelope.title) {
-
-        let envelopeExistsError = new Error("Envelope already exists.");
-        envelopeExistsError.status = 409;
-        return next(envelopeExistsError);
-
+      let envelopeExistsError = new Error("Envelope already exists.");
+      envelopeExistsError.status = 409;
+      return next(envelopeExistsError);
     }
-
   }
 
   // Add Envelope
@@ -68,19 +97,8 @@ EnvelopesRouter.post("/", (req, res, next) => {
   res.status(201).send(envelopeJSON);
 });
 
+// Create Target
 EnvelopesRouter.post("/:envelopeID", (req, res, next) => {
-  // Validate Param
-
-  const envelopeID = Number(req.params.envelopeID);
-
-  if (!(envelopeID > 0 && envelopeID < envelopes.length + 1)) {
-    let invalidIDError = new Error("ID not found.");
-    invalidIDError.status = 404;
-    return next(invalidIDError);
-  }
-
-  const index = envelopeID - 1;
-
   // Body Validation
 
   if (
@@ -98,6 +116,7 @@ EnvelopesRouter.post("/:envelopeID", (req, res, next) => {
 
   // Create Target instance
 
+  const index = req.envelopeID - 1;
   const targetID = envelopes[index].targets.length + 1;
   const newTarget = new Target(
     targetID,
@@ -115,6 +134,14 @@ EnvelopesRouter.post("/:envelopeID", (req, res, next) => {
     }
   });
 
+  if (!budgetIndex) {
+    let budgetNotSetError = new Error(
+      `Budget for ${newTarget.month} ${newTarget.year} not found.`
+    );
+    budgetNotSetError.status = 404;
+    return next(budgetNotSetError);
+  }
+
   if (!budgets[budgetIndex].validMonthlyBudget(newTarget.amount)) {
     let invalidAmountError = new Error(
       "You don't have enough Budget for this monthly Target"
@@ -126,13 +153,11 @@ EnvelopesRouter.post("/:envelopeID", (req, res, next) => {
   // Verify Uniqueness
 
   for (const target of envelopes[index].targets) {
-
-    if ((newTarget.year === target.year) && (newTarget.month === target.month)) {
-        let targetExistsError = new Error("Target already exists.");
-        targetExistsError.status = 409;
-        return next(targetExistsError);
-      }
-
+    if (newTarget.year === target.year && newTarget.month === target.month) {
+      let targetExistsError = new Error("Target already exists.");
+      targetExistsError.status = 409;
+      return next(targetExistsError);
+    }
   }
 
   // Add Target
