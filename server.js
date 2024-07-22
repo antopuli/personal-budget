@@ -17,8 +17,8 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
 // Envelopes Router
-/* const EnvelopesRouter = require("./routers/EnvelopesRouter");
-app.use("/envelopes", EnvelopesRouter); */
+const EnvelopesRouter = require("./routers/EnvelopesRouter");
+app.use("/envelopes", EnvelopesRouter);
 
 // Budgets Router
 const BudgetsRouter = require('./routers/BudgetsRouter');

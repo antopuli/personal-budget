@@ -1,30 +1,32 @@
 const express = require("express");
 const EnvelopesRouter = express.Router();
 
-const { envelopes, budgets } = require("../data");
-const { Envelope, Target } = require("../db");
+const { envelopes } = require("../data");
+const { Envelope } = require("../db");
 
-EnvelopesRouter.param("envelopeID", (req, res, next, id) => {
-  const envelopeID = Number(id);
+EnvelopesRouter.param("envelopeTitle", (req, res, next, title) => {
+  const envelopeIndex = envelopes.findIndex(
+    (envelope) => title === envelope.title
+  );
 
-  if (!(envelopeID > 0 && envelopeID < envelopes.length + 1)) {
-    let invalidIDError = new Error("ID not found.");
+  if (envelopeIndex === -1) {
+    let invalidIDError = new Error("Envelope not found.");
     invalidIDError.status = 404;
     return next(invalidIDError);
   }
 
-  req.envelopeID = envelopeID;
+  req.envelopeIndex = envelopeIndex;
   next();
 });
 
 // Retrive Envelopes
 EnvelopesRouter.get("/", (req, res, next) => {
   const envelopesJSON = JSON.stringify(
-    envelopes.map(envelope => {
+    envelopes.map((envelope) => {
       return {
         title: envelope.title,
         description: envelope.description,
-        icon: envelope.icon
+        icon: envelope.icon,
       };
     })
   );
@@ -33,7 +35,7 @@ EnvelopesRouter.get("/", (req, res, next) => {
 });
 
 // Retrive an Envelope
-EnvelopesRouter.get("/:envelopeID", (req, res, next) => {
+/* EnvelopesRouter.get("/:envelopeID", (req, res, next) => {
   const index = req.envelopeID - 1;
   const envelopeJSON = JSON.stringify({
     id: req.envelopeID,
@@ -48,13 +50,19 @@ EnvelopesRouter.get("/:envelopeID", (req, res, next) => {
     }),
   });
   res.send(envelopeJSON);
-});
+}); */
 
 // Create Envelope
 EnvelopesRouter.post("/", (req, res, next) => {
   // Body validation
 
-  if (!req.body.hasOwnProperty("title")) {
+  if (
+    !(
+      req.body.hasOwnProperty("title") &&
+      req.body.hasOwnProperty("description") &&
+      req.body.hasOwnProperty("icon")
+    )
+  ) {
     let invalidDataError = new Error("Invalid data.");
     invalidDataError.status = 400;
     return next(invalidDataError);
@@ -62,8 +70,11 @@ EnvelopesRouter.post("/", (req, res, next) => {
 
   // Create Envelope instance
 
-  const id = envelopes.length + 1;
-  const newEnvelope = new Envelope(id, req.body.title, []);
+  const newEnvelope = new Envelope(
+    req.body.title,
+    req.body.description,
+    req.body.icon
+  );
 
   // Verify Uniqueness
 
@@ -82,16 +93,16 @@ EnvelopesRouter.post("/", (req, res, next) => {
   // Send Envelope
 
   let envelopeJSON = JSON.stringify({
-    id: id,
     title: newEnvelope.title,
-    targets: newEnvelope.targets,
+    description: newEnvelope.description,
+    icon: newEnvelope.icon,
   });
 
   res.status(201).send(envelopeJSON);
 });
 
 // Create Target
-EnvelopesRouter.post("/:envelopeID", (req, res, next) => {
+/* EnvelopesRouter.post("/:envelopeID", (req, res, next) => {
   // Body Validation
 
   if (
@@ -167,6 +178,46 @@ EnvelopesRouter.post("/:envelopeID", (req, res, next) => {
   });
 
   res.status(201).send(targetJSON);
+}); */
+
+EnvelopesRouter.put("/:envelopeTitle", (req, res, next) => {
+  // Body Validation
+
+  if (
+    !(
+      req.body.hasOwnProperty("title") &&
+      req.body.hasOwnProperty("description") &&
+      req.body.hasOwnProperty("icon")
+    )
+  ) {
+    let invalidDataError = new Error("Invalid data.");
+    invalidDataError.status = 400;
+    return next(invalidDataError);
+  }
+
+  // Envelope modification
+
+  const envelopeIndex = req.envelopeIndex;
+  envelopes[envelopeIndex].title = req.body.title;
+  envelopes[envelopeIndex].description = req.body.description;
+  envelopes[envelopeIndex].icon = req.body.icon;
+
+  // Send Envelope
+
+  let envelopeJSON = JSON.stringify({
+    title: envelopes[envelopeIndex].title,
+    description: envelopes[envelopeIndex].description,
+    icon: envelopes[envelopeIndex].icon
+  });
+
+  res.send(envelopeJSON);
+});
+
+EnvelopesRouter.delete("/:envelopeTitle", (req, res, next) => {
+
+  envelopes.splice(req.envelopeIndex, 1);
+  res.status(204).send();
+
 });
 
 module.exports = EnvelopesRouter;
