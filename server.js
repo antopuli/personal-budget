@@ -24,6 +24,10 @@ app.use("/envelopes", EnvelopesRouter);
 const BudgetsRouter = require('./routers/BudgetsRouter');
 app.use('/budgets', BudgetsRouter);
 
+// Targets Router
+const TargetsRouter = require('./routers/TargetsRouter');
+app.use('/targets', TargetsRouter);
+
 // Transactions Router
 /* const TransactionsRouter = require('./routers/TransactionsRouter');
 app.use('/transactions', TransactionsRouter); */

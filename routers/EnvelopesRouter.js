@@ -101,85 +101,7 @@ EnvelopesRouter.post("/", (req, res, next) => {
   res.status(201).send(envelopeJSON);
 });
 
-// Create Target
-/* EnvelopesRouter.post("/:envelopeID", (req, res, next) => {
-  // Body Validation
-
-  if (
-    !(
-      req.body.hasOwnProperty("year") &&
-      req.body.hasOwnProperty("month") &&
-      req.body.hasOwnProperty("amount") &&
-      typeof req.body.amount === "number"
-    )
-  ) {
-    let invalidIDError = new Error("Invalid data.");
-    invalidIDError.status = 400;
-    return next(invalidIDError);
-  }
-
-  // Create Target instance
-
-  const index = req.envelopeID - 1;
-  const targetID = envelopes[index].targets.length + 1;
-  const newTarget = new Target(
-    targetID,
-    req.body.year,
-    req.body.month,
-    Number(req.body.amount)
-  );
-
-  // Monthly Budget Validation
-
-  let budgetIndex;
-  budgets.forEach((budget, index) => {
-    if (budget.year === newTarget.year && budget.month === newTarget.month) {
-      budgetIndex = index;
-    }
-  });
-
-  if (!budgetIndex) {
-    let budgetNotSetError = new Error(
-      `Budget for ${newTarget.month} ${newTarget.year} not found.`
-    );
-    budgetNotSetError.status = 404;
-    return next(budgetNotSetError);
-  }
-
-  if (!budgets[budgetIndex].validMonthlyBudget(newTarget.amount)) {
-    let invalidAmountError = new Error(
-      "You don't have enough Budget for this monthly Target"
-    );
-    invalidAmountError.status = 400;
-    return next(invalidAmountError);
-  }
-
-  // Verify Uniqueness
-
-  for (const target of envelopes[index].targets) {
-    if (newTarget.year === target.year && newTarget.month === target.month) {
-      let targetExistsError = new Error("Target already exists.");
-      targetExistsError.status = 409;
-      return next(targetExistsError);
-    }
-  }
-
-  // Add Target
-
-  envelopes[index].targets.push(newTarget);
-
-  // Send Target
-
-  let targetJSON = JSON.stringify({
-    id: targetID,
-    year: newTarget.year,
-    month: newTarget.month,
-    amount: newTarget.amount,
-  });
-
-  res.status(201).send(targetJSON);
-}); */
-
+// Modify Envelope
 EnvelopesRouter.put("/:envelopeTitle", (req, res, next) => {
   // Body Validation
 
@@ -213,6 +135,7 @@ EnvelopesRouter.put("/:envelopeTitle", (req, res, next) => {
   res.send(envelopeJSON);
 });
 
+// Delete Envelope
 EnvelopesRouter.delete("/:envelopeTitle", (req, res, next) => {
 
   envelopes.splice(req.envelopeIndex, 1);

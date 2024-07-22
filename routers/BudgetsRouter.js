@@ -4,9 +4,9 @@ const BudgetsRouter = express.Router();
 const { budgets } = require("../data");
 const { Budget } = require("../db");
 
-BudgetsRouter.param("month", (req, res, next) => {
+BudgetsRouter.param("month", (req, res, next, month) => {
   const budgetIndex = budgets.findIndex(
-    (budget) => budget.month === req.params.month
+    (budget) => budget.month === month
   );
   if (budgetIndex === -1) {
     let budgetNotFoundError = new Error("Budget not found.");
