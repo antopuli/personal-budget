@@ -3,6 +3,7 @@ const { Envelope, Target, Budget } = require("./db");
 const budgets = [
   new Budget(1, "2024", "July", 2000),
   new Budget(2, "2024", "August", 1800),
+  new Budget(3, "2024", "September", 5800),
 ];
 
 const envelopes = [

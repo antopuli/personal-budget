@@ -22,6 +22,21 @@ class Budget extends MonthlyAmount {
 
     }
 
+    validMonthlyBudget(amount) {
+
+        if ((this.amount - amount) < 0) {
+
+            return false;
+
+        } else {
+
+            this.amount -= amount;
+            return true;
+
+        }
+
+    }
+
 }
 
 class Target extends MonthlyAmount {
@@ -44,6 +59,10 @@ class Envelope {
         this.title = title;
         this.targets = targets;
 
+    }
+
+    get getId() {
+        return this.#id;
     }
 
 }
