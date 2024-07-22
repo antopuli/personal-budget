@@ -1,49 +1,10 @@
 
-class MonthlyAmount {
+class Budget {
 
-    #id;
-    
-    constructor(id, year, month, amount) {
+    constructor(month, budget) {
 
-        this.#id = id;
-        this.year = year;
-        this.month = month;
-        this.amount = amount;
-
-    }
-
-}
-
-class Budget extends MonthlyAmount {
-
-    constructor(id, year, month, amount) {
-
-        super(id, year, month, amount);
-
-    }
-
-    validMonthlyBudget(amount) {
-
-        if ((this.amount - amount) < 0) {
-
-            return false;
-
-        } else {
-
-            this.amount -= amount;
-            return true;
-
-        }
-
-    }
-
-}
-
-class Target extends MonthlyAmount {
-
-    constructor(id, year, month, amount) {
-
-        super(id, year, month, amount);
+        this.month = month; 
+        this.budget = budget;
 
     }
 
@@ -51,25 +12,45 @@ class Target extends MonthlyAmount {
 
 class Envelope {
 
-    #id;
+    constructor(title, description, icon) {
 
-    constructor(id, title, targets) {
-        
-        this.#id = id;
         this.title = title;
-        this.targets = targets;
+        this.description = description;
+        this.icon = icon;
 
-    }
-
-    get getId() {
-        return this.#id;
     }
 
 }
 
+class Target {
+
+    constructor(id, month_budget, title_envelope, target) {
+
+        this.id = id;
+        this.month_budget = month_budget;
+        this.title_envelope = title_envelope;
+        this.target = target;
+        
+    }
+
+}
+
+class Transaction {
+
+    constructor(id, title, description, id_target, day, amount) {
+
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.id_target = id_target;
+        this.day = day;
+        this.amount = amount;
+
+    }
+
+}
 
 module.exports = {
-    Envelope,
-    Target,
-    Budget
+    Budget,
+    Envelope
 }

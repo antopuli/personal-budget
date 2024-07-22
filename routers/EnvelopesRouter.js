@@ -1,8 +1,8 @@
 const express = require("express");
 const EnvelopesRouter = express.Router();
 
-const { envelopes, budgets } = require("./data");
-const { Envelope, Target } = require("./db");
+const { envelopes, budgets } = require("../data");
+const { Envelope, Target } = require("../db");
 
 EnvelopesRouter.param("envelopeID", (req, res, next, id) => {
   const envelopeID = Number(id);
@@ -20,18 +20,11 @@ EnvelopesRouter.param("envelopeID", (req, res, next, id) => {
 // Retrive Envelopes
 EnvelopesRouter.get("/", (req, res, next) => {
   const envelopesJSON = JSON.stringify(
-    envelopes.map((envelope, index) => {
+    envelopes.map(envelope => {
       return {
-        id: index + 1,
         title: envelope.title,
-        targets: envelope.targets.map((target, index) => {
-          return {
-            id: index + 1,
-            year: target.year,
-            month: target.month,
-            amount: target.amount,
-          };
-        }),
+        description: envelope.description,
+        icon: envelope.icon
       };
     })
   );

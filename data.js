@@ -1,6 +1,16 @@
-const { Envelope, Target, Budget } = require("./db");
+const { Budget, Envelope } = require("./db");
 
 const budgets = [
+    new Budget("2024-1", 2000),
+    new Budget("2024-2", 2000),
+];
+
+const envelopes = [
+    new Envelope("Clothing", "Clothing description...", "👔"),
+    new Envelope("Fitness", "Fitness description...", "👔"),
+]
+
+/* const budgets = [
   new Budget(1, "2024", "July", 2000),
   new Budget(2, "2024", "August", 1800),
   new Budget(3, "2024", "September", 5800),
@@ -16,6 +26,8 @@ const envelopes = [
     new Target(2, "2024", "August", 250),
   ]),
 ];
+
+const transactions = [] */
 
 module.exports = {
     budgets, 
