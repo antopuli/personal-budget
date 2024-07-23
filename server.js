@@ -1,6 +1,14 @@
 const express = require("express");
 const app = express();
 
+/* 
+
+TODO:
+- It is necessary to add a property to the Budget class to face
+those situations when we need to aggregate Available Targets
+
+*/
+
 // Listening
 require("dotenv").config();
 const PORT = process.env.PORT;
@@ -29,8 +37,8 @@ const TargetsRouter = require('./routers/TargetsRouter');
 app.use('/targets', TargetsRouter);
 
 // Transactions Router
-/* const TransactionsRouter = require('./routers/TransactionsRouter');
-app.use('/transactions', TransactionsRouter); */
+const TransactionsRouter = require('./routers/TransactionsRouter');
+app.use('/transactions', TransactionsRouter); 
 
 // Error Handling
 app.use((err, req, res, next) => {

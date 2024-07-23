@@ -93,10 +93,73 @@ class Transaction {
     this.day = day;
     this.amount = amount;
   }
+  createTransaction(targets, budgets) {
+    const targetIndex = targets.findIndex(
+      (target) => target.id === this.id_target
+    );
+    targets[targetIndex].target -= this.amount;
+    const budgetIndex = budgets.findIndex(
+      (budget) => budget.month === targets[targetIndex].month_budget
+    );
+    budgets[budgetIndex].budget -= this.amount;
+  }
+  removeTransaction(targets, budgets) {
+    const targetIndex = targets.findIndex(
+        (target) => target.id === this.id_target
+      );
+      targets[targetIndex].target += this.amount;
+      const budgetIndex = budgets.findIndex(
+        (budget) => budget.month === targets[targetIndex].month_budget
+      );
+      budgets[budgetIndex].budget += this.amount;
+  }
+  static validateReqBody(body) {
+    if (
+      !(
+        body.hasOwnProperty("title") &&
+        body.hasOwnProperty("description") &&
+        body.hasOwnProperty("year") &&
+        body.hasOwnProperty("month") &&
+        body.hasOwnProperty("day") &&
+        body.hasOwnProperty("envelope") &&
+        body.hasOwnProperty("amount")
+      )
+    ) {
+      let invalidDataError = new Error("Invalid Data.");
+      invalidDataError.status = 400;
+      throw invalidDataError;
+    }
+  }
+  static getTargetId(targets, month, year, envelope) {
+    const target = targets.find((target) => {
+      return (
+        target.month_budget === `${year}-${month}` &&
+        target.title_envelope === envelope
+      );
+    });
+    if (!target) {
+      let targetNotFoundError = new Error("Target not found.");
+      targetNotFoundError.status = 404;
+      throw targetNotFoundError;
+    } else {
+      return target.id;
+    }
+  }
+  static validateId(id, transactions) {
+    const transactionIndex = transactions.findIndex((transaction) => String(transaction.id) === id);
+    if (transactionIndex === -1) {
+      let transactionNotFoundError = new Error("Transaction not found.");
+      transactionNotFoundError.status = 404;
+      throw transactionNotFoundError;
+    } else {
+      return transactionIndex;
+    }
+  }
 }
 
 module.exports = {
   Budget,
   Envelope,
   Target,
+  Transaction,
 };
